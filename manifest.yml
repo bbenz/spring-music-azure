@@ -4,14 +4,13 @@ applications:
   memory: 512M
   instances: 1
   host: spring-music-${random-word}
-  domain: a1-app.cf-app.com
+  domain: cfapps.io
   path: build/libs/spring-music.war
   services:
     newrelic:
-      label: newrelic-dev
+      label: newrelic
       provider: newrelic
       version: n/a
       plan: standard
   env:
-    NEW_RELIC_HOST: staging-collector.newrelic.com
-    CATALINA_OPTS: "-javaagent:/app/webapps/ROOT/WEB-INF/lib/newrelic-agent-2.19.1.jar -Dnewrelic.home='/app/webapps/ROOT/WEB-INF/classes' -Dnewrelic.config.license_key=d2cfbfcf7b8a7c416b6071b7ee08cb66a8c2d5ea -Dnewrelic.config.app_name=spring-music -Dnewrelic.config.log_file_path='/home/vcap/logs'"
+    CATALINA_OPTS: "-javaagent:/app/webapps/ROOT/WEB-INF/lib/newrelic-agent-2.19.1.jar -Dnewrelic.home='/app/webapps/ROOT/WEB-INF/classes' -Dnewrelic.config.license_key='18db0ddea4899cdcc6911fd092578417ea35f339' -Dnewrelic.config.app_name='spring-music' -Dnewrelic.config.log_file_path='/home/vcap/logs'"
