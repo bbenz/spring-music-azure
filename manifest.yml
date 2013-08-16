@@ -1,16 +1,20 @@
 ---
 applications:
 - name: spring-music
-  memory: 1024M
+  memory: 512M
   instances: 1
   host: spring-music-${random-word}
   domain: cfapps.io
   path: build/libs/spring-music.war
+  buildpack: https://github.com/cloudfoundry/java-buildpack
   services:
+    music-db: 
+      label: elephantsql
+      provider: elephantsql
+      version: n/a
+      plan: turtle
     newrelic:
       label: newrelic
       provider: newrelic
       version: n/a
       plan: standard
-  env:
-    CATALINA_OPTS: "-javaagent:/app/webapps/ROOT/WEB-INF/lib/newrelic-agent-2.19.1.jar -Dnewrelic.home='/app/webapps/ROOT/WEB-INF/classes' -Dnewrelic.config.license_key='xxxxxxxxxx' -Dnewrelic.config.app_name='spring-music' -Dnewrelic.config.log_file_path='/home/vcap/logs'"
