@@ -1,12 +1,11 @@
 ---
 applications:
 - name: spring-music
-  memory: 512M
+  memory: 1024M
   instances: 1
   host: spring-music-${random-word}
   domain: cfapps.io
   path: build/libs/spring-music.war
-  buildpack: https://github.com/cloudfoundry/java-buildpack
   services:
     music-db: 
       label: elephantsql
