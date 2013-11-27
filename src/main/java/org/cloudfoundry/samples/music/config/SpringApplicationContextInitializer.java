@@ -1,5 +1,7 @@
 package org.cloudfoundry.samples.music.config;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.Cloud;
 import org.springframework.cloud.CloudException;
 import org.springframework.cloud.CloudFactory;
@@ -16,9 +18,12 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import java.util.*;
 
 public class SpringApplicationContextInitializer implements ApplicationContextInitializer<AnnotationConfigWebApplicationContext> {
+
+    private static final Log logger = LogFactory.getLog(SpringApplicationContextInitializer.class);
+
     private static final Map<Class<? extends ServiceInfo>, String> serviceTypeToProfileName =
             new HashMap<Class<? extends ServiceInfo>, String>();
-    private static final List<String> validProfiles = Arrays.asList("mysql", "postgres", "mongodb", "redis");
+    private static final List<String> validLocalProfiles = Arrays.asList("mysql", "postgres", "mongodb", "redis");
 
     public static final String IN_MEMORY_PROFILE = "in-memory";
 
@@ -35,18 +40,20 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
 
         ConfigurableEnvironment appEnvironment = applicationContext.getEnvironment();
 
-        String persistenceProfile = getCloudProfile(cloud);
-        if (persistenceProfile == null) {
-            persistenceProfile = getActiveProfile(appEnvironment);
+        String[] persistenceProfiles = getCloudProfile(cloud);
+        if (persistenceProfiles == null) {
+            persistenceProfiles = getActiveProfile(appEnvironment);
         }
-        if (persistenceProfile == null) {
-            persistenceProfile = IN_MEMORY_PROFILE;
+        if (persistenceProfiles == null) {
+            persistenceProfiles = new String[] { IN_MEMORY_PROFILE };
         }
 
-        appEnvironment.addActiveProfile(persistenceProfile);
+        for (String persistenceProfile : persistenceProfiles) {
+            appEnvironment.addActiveProfile(persistenceProfile);
+        }
     }
 
-    public String getCloudProfile(Cloud cloud) {
+    public String[] getCloudProfile(Cloud cloud) {
         if (cloud == null) {
             return null;
         }
@@ -54,6 +61,9 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
         List<String> profiles = new ArrayList<String>();
 
         List<ServiceInfo> serviceInfos = cloud.getServiceInfos();
+
+        logger.info("Found serviceInfos: " + StringUtils.collectionToCommaDelimitedString(serviceInfos));
+
         for (ServiceInfo serviceInfo : serviceInfos) {
             if (serviceTypeToProfileName.containsKey(serviceInfo.getClass())) {
                 profiles.add(serviceTypeToProfileName.get(serviceInfo.getClass()));
@@ -68,7 +78,11 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
                             StringUtils.collectionToCommaDelimitedString(profiles) + "]");
         }
 
-        return (profiles.size() > 0) ? profiles.get(0) : null;
+        if (profiles.size() > 0) {
+            return createProfileNames(profiles.get(0), "cloud");
+        }
+
+        return null;
     }
 
     private Cloud getCloud() {
@@ -80,22 +94,32 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
         }
     }
 
-    private String getActiveProfile(ConfigurableEnvironment appEnvironment) {
+    private String[] getActiveProfile(ConfigurableEnvironment appEnvironment) {
         List<String> serviceProfiles = new ArrayList<String>();
 
         for (String profile : appEnvironment.getActiveProfiles()) {
-            if (validProfiles.contains(profile)) {
+            if (validLocalProfiles.contains(profile)) {
                 serviceProfiles.add(profile);
             }
         }
 
         if (serviceProfiles.size() > 1) {
             throw new IllegalStateException("Only one active Spring profile may be set among the following: " +
-                    validProfiles.toString() + ". " +
+                    validLocalProfiles.toString() + ". " +
                     "These profiles are active: [" +
                     StringUtils.collectionToCommaDelimitedString(serviceProfiles) + "]");
         }
 
-        return (serviceProfiles.size() > 0) ? serviceProfiles.get(0) : null;
+        if (serviceProfiles.size() > 0) {
+            return createProfileNames(serviceProfiles.get(0), "local");
+        }
+
+        return null;
+    }
+
+    private String[] createProfileNames(String baseName, String suffix) {
+        String[] profileNames = {baseName, baseName + "-" + suffix};
+        logger.info("Setting profile names: " + StringUtils.arrayToCommaDelimitedString(profileNames));
+        return profileNames;
     }
 }
