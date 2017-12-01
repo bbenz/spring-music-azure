@@ -35,6 +35,7 @@ public class SpringApplicationContextInitializer implements ApplicationContextIn
         serviceTypeToProfileName.put(RedisServiceInfo.class, "redis");
         serviceTypeToProfileName.put(OracleServiceInfo.class, "oracle");
         serviceTypeToProfileName.put(SqlServerServiceInfo.class, "sqlserver");
+        serviceTypeToProfileName.put(SqlServerServiceInfo.class, "mongodb_azure");
     }
 
     @Override
