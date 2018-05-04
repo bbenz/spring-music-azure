@@ -65,6 +65,16 @@ dependencies {
     // Testing
     testCompile "junit:junit"
     testCompile "org.springframework.boot:spring-boot-starter-test"
+
+    // Opentracing.
+    compile "io.opentracing:opentracing-api:0.31.0"
+    compile "io.opentracing.contrib:opentracing-spring-cloud-starter:0.1.9"
+
+    // LightStep specific dependencies.
+    compile "com.lightstep.tracer:lightstep-tracer-jre:0.14.1"
+    compile "com.lightstep.tracer:tracer-grpc:0.15.1"
+    compile "io.grpc:grpc-netty:1.4.0"
+    compile "io.netty:netty-tcnative-boringssl-static:2.0.5.Final"
 }
 
 jar {

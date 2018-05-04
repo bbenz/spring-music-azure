@@ -1,6 +1,21 @@
 angular.module('albums', ['ngResource', 'ui.bootstrap']).
     factory('Albums', function ($resource) {
-        return $resource('albums');
+        return $resource('albums', {}, {
+            save: { // For all save() operations, propagate the context.
+                method: 'POST',
+                transformRequest: function(data, getHeaders) {
+                    // Inject the context into the request headers.
+                    opentracing.globalTracer().inject(data.span.context(),
+                            opentracing.FORMAT_HTTP_HEADERS,
+                            getHeaders());
+
+                    // Remove the passed Span prior to serialization.
+                    delete data.span;
+
+                    return angular.toJson(data);
+                }
+            }
+        });
     }).
     factory('Album', function ($resource) {
         return $resource('albums/:id', {id: '@id'});
@@ -37,13 +52,19 @@ function AlbumsController($scope, $modal, Albums, Album, Status) {
     }
 
     function saveAlbum(album) {
+        var span = opentracing.globalTracer().startSpan('client-add-album');
+        album.span = span; // Decorate the album so it can be later fetched to inject the context.
+
         Albums.save(album,
             function () {
                 Status.success("Album saved");
+                span.finish();
                 list();
             },
             function (result) {
                 Status.error("Error saving album: " + result.status);
+                span.setTag('error', true);
+                span.finish();
             }
         );
     }
