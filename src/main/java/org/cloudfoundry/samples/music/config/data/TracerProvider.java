@@ -31,7 +31,7 @@ public final class TracerProvider {
     static Tracer loadJaegerTracer()
     {
         SamplerConfiguration samplerConfig = new SamplerConfiguration("const", 1);
-        ReporterConfiguration reporterConfig = new ReporterConfiguration(true, null, null, null, null);
+        ReporterConfiguration reporterConfig = new ReporterConfiguration(true, "localhost", null, null, null);
         Configuration config = new Configuration(SERVICE_NAME, samplerConfig, reporterConfig);
         return config.getTracer();
     }
