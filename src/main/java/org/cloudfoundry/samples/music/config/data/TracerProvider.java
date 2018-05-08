@@ -13,8 +13,8 @@ public final class TracerProvider {
 
     public static Tracer loadTracer() throws MalformedURLException
     {
-        return loadLightStepTracer();
-        //return loadJaegerTracer();
+        //return loadLightStepTracer();
+        return loadJaegerTracer();
     }
 
     static Tracer loadLightStepTracer() throws MalformedURLException
