@@ -75,6 +75,9 @@ dependencies {
     compile "com.lightstep.tracer:tracer-grpc:0.15.1"
     compile "io.grpc:grpc-netty:1.4.0"
     compile "io.netty:netty-tcnative-boringssl-static:2.0.5.Final"
+
+    // Jaeger specific dependencies.
+    compile "io.jaegertracing:jaeger-core:0.27.0"
 }
 
 jar {
