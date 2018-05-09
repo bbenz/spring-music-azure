@@ -11,6 +11,9 @@ import io.jaegertracing.Configuration.SamplerConfiguration;
 public final class TracerProvider {
     public static final String SERVICE_NAME = "spring-music";
 
+    // Jaeger specific information.
+    public static final String JAEGER_AGENT_HOST = "40.70.245.13";
+
     public static Tracer loadTracer() throws MalformedURLException
     {
         //return loadLightStepTracer();
@@ -31,7 +34,7 @@ public final class TracerProvider {
     static Tracer loadJaegerTracer()
     {
         SamplerConfiguration samplerConfig = new SamplerConfiguration("const", 1);
-        ReporterConfiguration reporterConfig = new ReporterConfiguration(true, "localhost", null, null, null);
+        ReporterConfiguration reporterConfig = new ReporterConfiguration(true, JAEGER_AGENT_HOST, null, null, null);
         Configuration config = new Configuration(SERVICE_NAME, samplerConfig, reporterConfig);
         return config.getTracer();
     }
