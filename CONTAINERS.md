@@ -8,7 +8,7 @@ git clone git@github.com:bbenz/spring-music-lightstep.git
 cd spring-music-lightstep/
 
 # build with openjdk:10 image and gradlew
-docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp -p 8080:8080/tcp openjdk:10 bash
+docker run --rm -it -v "$PWD":/usr/src/myapp -w /usr/src/myapp -p 8080:8080/tcp openjdk:8 bash
 ./gradlew clean assemble
 
 # or build with gradle:jdk10 image and gradle
@@ -26,16 +26,16 @@ java -jar -Dspring.profiles.active=mongodb build/libs/spring-music.jar
 1. Create [Dockerfile](Dockerfile)
 
 ```
-FROM gradle:jdk10 as builder
+FROM gradle:jdk8 as builder
 USER root
 WORKDIR /home/gradle/
 COPY . /home/gradle/
-RUN gradle clean assemble
+RUN	gradle clean assemble
 
-FROM openjdk:10-slim
+FROM openjdk:8-alpine
 WORKDIR /home/
 COPY --from=builder /home/gradle/build/libs/spring-music.jar /home/
-ENTRYPOINT [ "java", "-XX:+UnlockExperimentalVMOptions", "-jar", "/home/spring-music.jar" ]
+ENTRYPOINT [ "java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "/home/spring-music.jar" ]
 ```
 
 2. Build and debug locally
@@ -61,6 +61,7 @@ java -jar /home/spring-music.jar
 RESOURCE_GROUP='180900-test'
 LOCATION='eastus'
 if [ -z "$RANDOM_STR" ]; then RANDOM_STR=$(openssl rand -hex 3); else echo $RANDOM_STR; fi
+# RANDOM_STR='9f889c'
 CONTAINER_REGISTRY=acr${RANDOM_STR}
 CONTAINER_IMAGE='spring-music:v1'
 KUBERNETES_SERVICE=aks${RANDOM_STR}
@@ -77,7 +78,7 @@ az aks create -g $RESOURCE_GROUP -n $KUBERNETES_SERVICE --node-count 3 --generat
 
 # install cli and connect to aks cluster
 az aks install-cli
-az aks get-credentials -g $RESOURCE_GROUP -n $CONTAINER_SERVICE
+az aks get-credentials -g $RESOURCE_GROUP -n $KUBERNETES_SERVICE
 ```
 
 3. [Grant Azure Kubernetes Service access to Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-auth-aks#grant-aks-access-to-acr)
