@@ -13,17 +13,21 @@ import javax.validation.Valid;
 @RequestMapping(value = "/albums")
 public class AlbumController {
     private static final Logger logger = LoggerFactory.getLogger(AlbumController.class);
-    private CrudRepository<Album, String> repository;
-
-    @Autowired
+    
+    public static CrudRepository<Album, String> repository;
+      
+   
+    //@Autowired( required = false )
     public AlbumController(CrudRepository<Album, String> repository) {
         this.repository = repository;
     }
 
+    
+
     @RequestMapping(method = RequestMethod.GET)
     public Iterable<Album> albums() {
         return repository.findAll();
-    }
+    } 
 
     @RequestMapping(method = RequestMethod.PUT)
     public Album add(@RequestBody @Valid Album album) {
@@ -48,4 +52,9 @@ public class AlbumController {
         logger.info("Deleting album " + id);
         repository.delete(id);
     }
+
+    /*Changed to be compatible with Wildfly*/
+    //@Deprecated
+    //private AlbumController() {
+    //   }
 }
