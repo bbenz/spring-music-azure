@@ -16,8 +16,6 @@ buildscript {
 }
 
 apply plugin: 'java'
-//bb-added locally to build a war file
-apply plugin: 'war'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'idea'
 
