@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: spring-music
-        image: acr9f889c.azurecr.io/spring-music:v1
+        image: bbenzacr.azurecr.io/spring-music:v1
         ports:
         - containerPort: 8080
         env:
